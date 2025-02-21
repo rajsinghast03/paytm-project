@@ -1,7 +1,7 @@
 const express = require("express");
 const UserRouter = express.Router();
 const zod = require("zod");
-const { User } = require("../db");
+const { User, Account } = require("../db");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { authMiddleware } = require("../middlewares/authMiddleware");
@@ -54,7 +54,12 @@ UserRouter.post("/signup", async (req, res) => {
   const salt = await bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(user.password, salt);
 
-  await User.create({ ...user, password: hashedPassword });
+  const dbUser = await User.create({ ...user, password: hashedPassword });
+
+  await Account.create({
+    userId: dbUser._id,
+    balance: Math.random() * 10000 + 1,
+  });
 
   return res.json({ message: "User created successfully" });
 });
@@ -103,7 +108,7 @@ UserRouter.patch("/", authMiddleware, async (req, res) => {
     req.body.password = hashedPassword;
   }
 
-  await User.updateOne({ _id: req.body._id }, req.body);
+  await User.updateOne({ _id: req._id }, req.body);
 
   return res.json({ message: "User udpated successfully!" });
 });
