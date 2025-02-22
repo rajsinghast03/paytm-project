@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const connectDb = async () => {
   try {
-    const conn = await mongoose.connect(`${process.env.MONGO_URL}`);
+    const conn = await mongoose.connect(`${process.env.MONGO_URL}/digi-wallet`);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(error.message);
